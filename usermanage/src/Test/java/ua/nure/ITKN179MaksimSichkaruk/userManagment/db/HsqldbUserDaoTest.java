@@ -3,8 +3,10 @@ package ua.nure.ITKN179MaksimSichkaruk.userManagment.db;
 import java.util.Calendar;
 
 import org.dbunit.DatabaseTestCase;
+import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.xml.XmlDataSet;
 
 import ua.nure.ITKN179MaksimSichkaruk.userManagment.User;
 
@@ -43,7 +45,6 @@ public class HsqldbUserDaoTest extends DatabaseTestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		connectionFactory = new ConnectionFactoryImplement();
 		dao = new HsqldbUserDao(connectionFactory);
 	}
 
@@ -53,13 +54,13 @@ public class HsqldbUserDaoTest extends DatabaseTestCase {
 
 	@Override
 	protected IDatabaseConnection getConnection() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		connectionFactory = new ConnectionFactoryImplement();
+		return new DatabaseConnection(connectionFactory.createConnection());
 	}
 
 	@Override
 	protected IDataSet getDataSet() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		IDataSet dataSet = new XmlDataSet(getClass().getClassLoader().getResourceAsStream("userdataset.xml"));
+		return dataSet;
 	}
 }
