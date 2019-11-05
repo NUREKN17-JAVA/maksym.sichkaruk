@@ -18,13 +18,20 @@ public class HsqldbUserDao implements Dao<User> {
 	
 	private ConnectionFactory connectionFactory;
 
+	public HsqldbUserDao() {
+    }
+	
 	public HsqldbUserDao(ConnectionFactory connectionFactory) {
         this.connectionFactory = connectionFactory;
     }
+	
+	public ConnectionFactory getConnectionFactory() {
+        return connectionFactory;
+    }
 
-	public HsqldbUserDao() {
-		// TODO Auto-generated constructor stub
-	}
+    public void setConnectionFactory(ConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
+    }
 
 	@Override
 	public User create(User entity) throws DatabaseException {
