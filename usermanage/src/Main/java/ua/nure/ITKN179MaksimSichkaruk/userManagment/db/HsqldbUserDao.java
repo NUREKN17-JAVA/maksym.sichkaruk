@@ -13,6 +13,9 @@ import java.util.LinkedList;
 import ua.nure.ITKN179MaksimSichkaruk.userManagment.User;
 
 class HsqldbUserDao implements Dao<User> {
+	private static final String UPDATE_QUERY = "UPDATE users SET firstname=?, lastname=?, dateofbirth=? WHERE id=?";
+	private static final String SELECT_BY_ID = "SELECT * FROM users WHERE id=?";
+	private static final String DELETE_QUERY = "DELETE FROM users WHERE id=?";
 	private static final String INSERT_QUERY = "INSERT INTO users (firstname, lastname, dateofbirth) VALUES (?, ?, ?)";
 	private static final String SELECT_ALL_QUERY = "SELECT * FROM users";
 	
@@ -64,20 +67,67 @@ class HsqldbUserDao implements Dao<User> {
 
 	@Override
 	public void update(User entity) throws DatabaseException {
-		// TODO Auto-generated method stub
-		
+		try {
+			Connection connection = connectionFactory.createConnection();
+			PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY);
+			statement.setString(1, entity.getFirstName());
+			statement.setString(2, entity.getLastName());
+			statement.setDate(3, new Date(entity.getDateofBirth().getTime()));
+			statement.setLong(4, entity.getId().longValue());
+			
+			int n = statement.executeUpdate();
+	        if (n != 1) {
+	        	throw new DatabaseException("Number of the updated rows: " + n);
+	        }
+	        statement.close();
+	        connection.close();
+		} catch (SQLException e) {
+			throw new DatabaseException(e);
+		}
 	}
 
 	@Override
 	public void delete(User entity) throws DatabaseException {
-		// TODO Auto-generated method stub
+		try {
+            Connection connection = connectionFactory.createConnection();
+            PreparedStatement statement = connection.prepareStatement(DELETE_QUERY);
+            statement.setLong(1, entity.getId().longValue());
+            int n = statement.executeUpdate();
+            if (n != 1) {
+                throw new DatabaseException("Number of the deleted rows: " + n);
+            }
+            statement.close();
+            connection.close();
+		} catch (SQLException e) {
+            throw new DatabaseException(e);
+        }
 		
 	}
 
 	@Override
 	public User find(long id) throws DatabaseException {
-		// TODO Auto-generated method stub
-		return null;
+		 try {
+        	 User user = null;
+        	 Connection connection = connectionFactory.createConnection();
+        	 PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID);
+        	 statement.setLong(1, id);
+        	 ResultSet resultSet = statement.executeQuery();
+        	 if (resultSet.next()) {
+        		 user = new User();
+            	 user.setId(resultSet.getLong(1));
+                 user.setFirstName(resultSet.getString(2));
+                 user.setLastName(resultSet.getString(3));
+                 user.setDateofBirth(resultSet.getDate(4));
+             }
+             
+             resultSet.close();
+             statement.close();
+ 	         connection.close();
+             
+             return user;
+		} catch (SQLException e) {
+			throw new DatabaseException(e);
+		}
 	}
 
 	@Override
