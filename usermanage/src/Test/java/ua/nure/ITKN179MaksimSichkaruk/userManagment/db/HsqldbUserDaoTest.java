@@ -16,6 +16,11 @@ import ua.nure.ITKN179MaksimSichkaruk.userManagment.User;
 public class HsqldbUserDaoTest extends DatabaseTestCase {
 	private HsqldbUserDao dao;
 	private ConnectionFactory connectionFactory;
+	
+	private static final String DRIVER = "org.hsqldb.jdbcDriver";
+	private static final String URL = "jdbc:hsqldb:file:db/usermanage";
+	private static final String USER = "sa";
+    private static final String PASSWORD = "";
 
 	private static final String LAST_NAME = "Jobs";
 	private static final String FIRST_NAME = "Steve";
@@ -60,7 +65,7 @@ public class HsqldbUserDaoTest extends DatabaseTestCase {
 
 	@Override
 	protected IDatabaseConnection getConnection() throws Exception {
-		connectionFactory = new ConnectionFactoryImplement();
+		connectionFactory = new ConnectionFactoryImplement(DRIVER, URL, USER, PASSWORD);
 		return new DatabaseConnection(connectionFactory.createConnection());
 	}
 
