@@ -1,6 +1,7 @@
 package ua.nure.ITKN179MaksimSichkaruk.userManagment.db;
 
 import java.util.Calendar;
+import java.util.Collection;
 
 import org.dbunit.DatabaseTestCase;
 import org.dbunit.database.DatabaseConnection;
@@ -41,6 +42,11 @@ public class HsqldbUserDaoTest extends DatabaseTestCase {
         assertEquals(user.getDateofBirth(), userToCheck.getDateofBirth());
 
 	}
+	public void testFindAll() throws DatabaseException {
+        Collection<User> items = dao.findAll();
+        assertNotNull("Collection is null", items);
+        assertEquals("Collection size doesn't match.", 2, items.size());
+    }
 
 
 	protected void setUp() throws Exception {
