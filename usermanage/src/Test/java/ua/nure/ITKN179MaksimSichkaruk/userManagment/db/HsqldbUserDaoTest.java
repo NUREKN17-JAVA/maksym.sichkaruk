@@ -12,6 +12,7 @@ import ua.nure.ITKN179MaksimSichkaruk.userManagment.User;
 
 public class HsqldbUserDaoTest extends DatabaseTestCase {
 	private HsqldbUserDao dao;
+	private ConnectionFactory connectionFactory;
 
 	private static final String LAST_NAME = "Jobs";
 	private static final String FIRST_NAME = "Steve";
@@ -41,6 +42,8 @@ public class HsqldbUserDaoTest extends DatabaseTestCase {
 
 
 	protected void setUp() throws Exception {
+		connectionFactory = new ConnectionFactoryImplement();
+		dao = new HsqldbUserDao(connectionFactory);
 		super.setUp();
 	}
 

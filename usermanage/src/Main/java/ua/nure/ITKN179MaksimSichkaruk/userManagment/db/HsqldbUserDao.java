@@ -5,6 +5,11 @@ import java.util.Collection;
 import ua.nure.ITKN179MaksimSichkaruk.userManagment.User;
 
 public class HsqldbUserDao implements Dao<User> {
+	private ConnectionFactory connectionFactory;
+
+	public HsqldbUserDao(ConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
+    }
 
 	public HsqldbUserDao() {
 		// TODO Auto-generated constructor stub
