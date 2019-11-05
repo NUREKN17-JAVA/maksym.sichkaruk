@@ -42,9 +42,9 @@ public class HsqldbUserDaoTest extends DatabaseTestCase {
 
 
 	protected void setUp() throws Exception {
+		super.setUp();
 		connectionFactory = new ConnectionFactoryImplement();
 		dao = new HsqldbUserDao(connectionFactory);
-		super.setUp();
 	}
 
 	protected void tearDown() throws Exception {
