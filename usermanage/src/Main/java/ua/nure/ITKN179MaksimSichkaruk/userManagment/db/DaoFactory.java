@@ -1,55 +1,49 @@
 package ua.nure.ITKN179MaksimSichkaruk.userManagment.db;
 
+
 import java.io.IOException;
 import java.util.Properties;
 
-import ua.nure.ITKN179MaksimSichkaruk.userManagment.User;
-
-public class DaoFactory {
-	private final Properties properties;
-	private static final String USER = "connection.user";
-	private static final String PASSWORD = "connection.password";
-	private static final String URL = "connection.url";
-	private static final String DRIVER = "connection.driver";
-	private static final String HSQLDB_USER_DAO = "dao.UserDao";
+public abstract class DaoFactory {
+	protected static final String USER_DAO = "dao.UserDao";
+	protected static final String DAO_FACTORY = "dao.Factory";
+	protected static Properties properties;
+	private static DaoFactory INSTANCE;
 	
-	private final static DaoFactory INSTANCE = new DaoFactory();
-	
-	public static DaoFactory getInstance() {
-        return INSTANCE;
-    }
-
-	public DaoFactory() {
+	static {
 		properties = new Properties();
-		try {
-			properties.load(getClass().getClassLoader().getResourceAsStream("settings.properties"));
+	try {
+		properties.load(DaoFactory.class.getClassLoader().getResourceAsStream("settings.properties"));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
+		}		
+	}		
+	
+	public static synchronized DaoFactory getInstance() {
+		if (INSTANCE == null) {
+			Class<?> factoryClass;
+			try {
+				factoryClass = Class.forName(properties.getProperty(DAO_FACTORY));
+				INSTANCE = (DaoFactory) factoryClass.newInstance();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
 		}
+		return INSTANCE;
+	}	
+	
+	protected DaoFactory() {		
 	}
 	
-	private ConnectionFactory getConnectionFactory() {
-		String user = properties.getProperty(USER);
-	    String password = properties.getProperty(PASSWORD);
-	    String url = properties.getProperty(URL);
-	    String driver = properties.getProperty(DRIVER);
-	    
-	    return new ConnectionFactoryImplement(user, password, url, driver);
+	public static void init (Properties prop) {
+		properties = prop;
+		INSTANCE = null;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public Dao<User> getUserDao() {
-		Dao<User> result = null;
-		try {
-			Class<?> hsqldbUserDaoClass = Class.forName(properties.getProperty(HSQLDB_USER_DAO));
-			result = (Dao<User>) hsqldbUserDaoClass.newInstance();
-            result.setConnectionFactory(getConnectionFactory());
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		
-		
-		return result;
+	protected ConnectionFactory getConnectionFactory() {
+		return new ConnectionFactoryImpl(properties);
 	}
-
+	
+	public abstract Dao getUserDao();
 }
+	

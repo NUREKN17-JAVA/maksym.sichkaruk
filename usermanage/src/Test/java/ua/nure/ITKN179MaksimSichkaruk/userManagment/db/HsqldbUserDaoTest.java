@@ -1,7 +1,7 @@
 package ua.nure.ITKN179MaksimSichkaruk.userManagment.db;
 
-import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 
 import org.dbunit.DatabaseTestCase;
 import org.dbunit.database.DatabaseConnection;
@@ -10,77 +10,66 @@ import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.XmlDataSet;
 
 import ua.nure.ITKN179MaksimSichkaruk.userManagment.User;
-
-
+import ua.nure.ITKN179MaksimSichkaruk.userManagment.db.ConnectionFactory;
+import ua.nure.ITKN179MaksimSichkaruk.userManagment.db.ConnectionFactoryImpl;
+import ua.nure.ITKN179MaksimSichkaruk.userManagment.db.DatabaseExeption;
+import ua.nure.ITKN179MaksimSichkaruk.userManagment.db.HsqldbUserDao;
 
 public class HsqldbUserDaoTest extends DatabaseTestCase {
+
+	private static final String LAST_NAME = "Doe";
+	private static final String FIRST_NAME = "John";
+	private static final String NEW_FIRST_NAME = "Lena";
 	private HsqldbUserDao dao;
 	private ConnectionFactory connectionFactory;
-	
-	private static final String DRIVER = "org.hsqldb.jdbcDriver";
-	private static final String URL = "jdbc:hsqldb:file:db/usermanage";
-	private static final String USER = "sa";
-    private static final String PASSWORD = "";
-
-    
-    private static final long TEST_ID = 1000;
-    private static final String TEST_LAST_NAME = "Wozniak";
-    
-	private static final String LAST_NAME = "Jobs";
-	private static final String FIRST_NAME = "Steve";
-	private static final int YEAR = 2010;
-	private static final int MONTH = 1;
-	private static final int CREATE_DAY = 1;
-
-
-
-	public void testCreate() throws DatabaseException {
-		User user = new User();
-
-		user.setFirstName(FIRST_NAME);
-		user.setLastName(LAST_NAME);
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(YEAR, MONTH, CREATE_DAY);
-		user.setDateofBirth(calendar.getTime());
-		assertNull(user.getId());
-		User userToCheck = dao.create(user);
-		assertNotNull(userToCheck);
-		assertNotNull(userToCheck.getId());
-		assertEquals(user.getFirstName(), userToCheck.getFirstName());
-        assertEquals(user.getLastName(), userToCheck.getLastName());
-        assertEquals(user.getDateofBirth(), userToCheck.getDateofBirth());
-
-	}
-	public void testFindAll() throws DatabaseException {
-        Collection<User> items = dao.findAll();
-        assertNotNull("Collection is null", items);
-        assertEquals("Collection size doesn't match.", 2, items.size());
-    }
-	public void testFind() throws DatabaseException {
-        User userToCheck = dao.find(TEST_ID);
-        assertNotNull(userToCheck);
-        assertEquals(FIRST_NAME, userToCheck.getFirstName());
-        assertEquals(LAST_NAME, userToCheck.getLastName());
-    }
-	public void testUpdate() throws DatabaseException {
-		 User userToUpdate = dao.find(TEST_ID);
-		 assertNotNull(userToUpdate);
-		 userToUpdate.setLastName(TEST_LAST_NAME);
-		 dao.update(userToUpdate);
-		 User updatedUser = dao.find(TEST_ID);
-		 assertEquals(updatedUser.getLastName(), TEST_LAST_NAME);
-	 }
-	public void testDelete() throws DatabaseException {
-		User userToDelete = new User();
-		userToDelete.setId(TEST_ID);
-		dao.delete(userToDelete);
-		assertNull(dao.find(TEST_ID));
-    }
-
+	private User user;
 
 	protected void setUp() throws Exception {
 		super.setUp();
 		dao = new HsqldbUserDao(connectionFactory);
+
+		user = new User();
+		user.setFirstName(FIRST_NAME);
+		user.setLastName(LAST_NAME);
+		user.setDateOfBirth(new Date());
+	}
+
+	public void testCreate() throws DatabaseExeption {
+		User userToCheck = dao.create(user);
+		assertNotNull(userToCheck);
+		assertNotNull(userToCheck.getId());
+		assertEquals(user.getFirstName(), userToCheck.getFirstName());
+		assertEquals(user.getLastName(), userToCheck.getLastName());
+		assertEquals(user.getDateOfBirth(), userToCheck.getDateOfBirth());
+	}
+
+	public void testFindAll() throws DatabaseExeption {
+		Collection<User> items = dao.findAll();
+		assertNotNull("Collection is null", items);
+		assertEquals("collectoin size does not match", 2, items.size());
+	}
+
+	public void testFind() throws DatabaseExeption {
+		User defaultUser = dao.create(user);
+		assertNotNull(defaultUser.getId());
+		User foundUser = dao.find(defaultUser.getId());
+		assertNotNull(foundUser);
+		assertEquals(defaultUser.getId(), foundUser.getId());
+	}
+
+	public void testUpdate() throws DatabaseExeption {
+		User testUser = dao.create(user);
+		assertEquals(testUser.getFirstName(), FIRST_NAME);
+		testUser.setFirstName(NEW_FIRST_NAME);
+		dao.update(testUser);
+		assertEquals(testUser.getFirstName(), NEW_FIRST_NAME);
+	}
+
+	public void testDelete() throws DatabaseExeption {
+		User testUser = dao.create(user);
+		assertNotNull(testUser.getId());
+		dao.delete(testUser);
+		assertNull(dao.find(testUser.getId()));
 	}
 
 	protected void tearDown() throws Exception {
@@ -89,13 +78,15 @@ public class HsqldbUserDaoTest extends DatabaseTestCase {
 
 	@Override
 	protected IDatabaseConnection getConnection() throws Exception {
-		connectionFactory = new ConnectionFactoryImplement(DRIVER, URL, USER, PASSWORD);
+		connectionFactory = new ConnectionFactoryImpl("org.hsqldb.jdbcDriver", "jdbc:hsqldb:file:db/usermanagement",
+				"sa", "");
 		return new DatabaseConnection(connectionFactory.createConnection());
 	}
 
 	@Override
 	protected IDataSet getDataSet() throws Exception {
-		IDataSet dataSet = new XmlDataSet(getClass().getClassLoader().getResourceAsStream("userdataset.xml"));
+		IDataSet dataSet = new XmlDataSet(getClass().getClassLoader().getResourceAsStream("userDataSet.xml"));
 		return dataSet;
 	}
+
 }

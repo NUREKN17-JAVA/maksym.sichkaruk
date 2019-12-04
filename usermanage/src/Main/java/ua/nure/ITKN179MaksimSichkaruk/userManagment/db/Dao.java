@@ -2,16 +2,18 @@ package ua.nure.ITKN179MaksimSichkaruk.userManagment.db;
 
 import java.util.Collection;
 
-public interface Dao<T> {
-	T create(T entity) throws DatabaseException;
+import ua.nure.ITKN179MaksimSichkaruk.userManagment.User;
 
-	void update(T entity) throws DatabaseException;
-
-	void delete(T entity) throws DatabaseException;
-
-	T find(long id) throws DatabaseException;
-
-	Collection<T> findAll() throws DatabaseException;
-
-	void setConnectionFactory(ConnectionFactory connectionFactory);
+public interface Dao {
+	User create(User entity) throws DatabaseExeption;
+	
+	User find(Long id) throws DatabaseExeption;
+	
+	void update(User entity) throws DatabaseExeption;
+	
+	void delete(User entity) throws DatabaseExeption;
+	
+	Collection<User> findAll() throws DatabaseExeption;
+	
+	void setConnectionFactory(ConnectionFactory connectoinFactory);
 }
